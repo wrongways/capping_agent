@@ -148,12 +148,14 @@ fn os() -> String {
     let os_release = fs::read_to_string("/etc/os-release").expect("Failed to read /ect/os_release");
     for line in os_release.lines() {
         let parts: Vec<&str> = line.split(':').collect();
-        assert!(parts.len() == 2);
-        let (lhs, rhs) = (parts[0], parts[1]);
-        match lhs.to_lowercase().trim() {
-            "name" => os_name = rhs.trim().to_string(),
-            "version" => os_version = rhs.trim().to_string(),
-            _ => continue,
+        println!("{parts:?}");
+        if parts.len() == 2 {
+            let (lhs, rhs) = (parts[0], parts[1]);
+            match lhs.to_lowercase().trim() {
+                "name" => os_name = rhs.trim().to_string(),
+                "version" => os_version = rhs.trim().to_string(),
+                _ => continue,
+            }
         }
     }
 
