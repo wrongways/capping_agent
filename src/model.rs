@@ -3,14 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Firestarter {
-    pub runtime_secs: u64,
-    pub load_pct: Option<u64>,
-    pub load_period: Option<u64>,
-    pub n_threads: Option<u64>,
-}
-
 pub type Semaphore = Arc<RwLock<bool>>;
 pub fn is_running() -> Semaphore {
     let semaphore: bool = false;
