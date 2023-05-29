@@ -73,7 +73,7 @@ fn convert_energy_to_power(stats: &Vec<RAPL_Readings>) -> Vec<RaplRecord> {
 
             // time delta is always positive so no loss of sign - and in any case makes no difference
             #[allow(clippy::cast_sign_loss)]
-            let power_watts = energy_delta_uj / time_delta.num_milliseconds() as u64;
+            let power_watts = energy_delta_uj / time_delta.num_microseconds().expect("failed to get time ∆ microseconds") as u64;
             power_readings.push(RaplData {
                 domain: reading.domain.clone(),
                 power_watts,

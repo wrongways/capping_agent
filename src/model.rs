@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc, serde::ts_seconds_option};
+use chrono::{DateTime, Utc, serde::ts_milliseconds_option};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -53,9 +53,9 @@ pub struct RaplData {
     pub power_watts: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct RaplRecord {
-    #[serde(with = "ts_seconds_option")]
+    #[serde(with = "ts_milliseconds_option")]
     pub timestamp: Option<DateTime<Utc>>,
     pub data: Vec<RaplData>,
 }
