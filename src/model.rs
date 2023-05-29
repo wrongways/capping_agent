@@ -50,7 +50,7 @@ pub struct ServerInfo {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RaplData {
     pub domain: String,
-    pub power_mW: u64,
+    pub power_watts: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
