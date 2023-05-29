@@ -45,7 +45,7 @@ pub struct RaplData {
     pub power_watts: u64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RaplRecord {
     #[serde(with = "ts_milliseconds_option")]
     pub timestamp: Option<DateTime<Utc>>,

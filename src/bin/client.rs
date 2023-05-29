@@ -1,7 +1,7 @@
 use simple_logger::SimpleLogger;
 use log::info;
 
-use agent::model::FirestarterParams;
+use agent::model::{FirestarterParams, RaplRecord};
 
 const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
 const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
@@ -23,10 +23,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         n_threads: 0,
     };
 
-    let rapl_stats = reqwest::Client::new()
+    let rapl_stats: Vec<RaplRecord> = reqwest::Client::new()
         .post(AGENT_RUN_TEST_ENDPOINT)
         .json(&fs_params)
         .send()
+        .await?
+        .json()
         .await?;
 
     info!("RAPL stats\n{rapl_stats:?}");
