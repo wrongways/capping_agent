@@ -145,10 +145,9 @@ fn os() -> String {
     let mut os_name = String::new();
     let mut os_version = String::new();
 
-    let os_release = fs::read_to_string("/etc/os-release").expect("Failed to read /ect/os_release");
+    let os_release = fs::read_to_string("/etc/os-release").expect("Failed to read /etc/os_release");
     for line in os_release.lines() {
-        let parts: Vec<&str> = line.split(':').collect();
-        println!("{parts:?}");
+        let parts: Vec<&str> = line.split('=').collect();
         if parts.len() == 2 {
             let (lhs, rhs) = (parts[0], parts[1]);
             match lhs.to_lowercase().trim() {
@@ -158,7 +157,7 @@ fn os() -> String {
             }
         }
     }
-
+    println!("os(): {os_name} {os_version}");
     format!("{os_name} {os_version}")
 }
 
