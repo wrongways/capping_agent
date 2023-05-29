@@ -15,6 +15,9 @@ struct CPUInfo {
     model: String,
     max_mhz: u64,
     min_mhz: u64,
+    threads_per_core: u64,
+    cores_per_socket: u64,
+    n_sockets: u64,
 }
 
 struct SysInfo {
@@ -36,6 +39,9 @@ pub async fn system_info_handler() -> impl IntoResponse {
         online_cpus: cpu_info.n_online,
         min_mhz: cpu_info.min_mhz,
         max_mhz: cpu_info.max_mhz,
+        threads_per_core: cpu_info.threads_per_core,
+        cores_per_socket: cpu_info.cores_per_socket,
+        n_sockets: cpu_info.n_sockets,
     };
 
     let bios_info = bios();
@@ -71,6 +77,9 @@ fn cpu_info() -> CPUInfo {
     let mut model = String::new();
     let mut min_mhz: u64 = 0;
     let mut max_mhz: u64 = 0;
+    let mut threads_per_core: u64 = 0;
+    let mut cores_per_socket: u64 = 0;
+    let mut n_sockets: u64 = 0;
 
     let cpu_info = String::from_utf8(
         Command::new("lscpu")
@@ -88,6 +97,9 @@ fn cpu_info() -> CPUInfo {
             "Model name" => model = rhs.trim().to_string(),
             "CPU min MHz" => min_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
             "CPU max MHz" => max_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
+            "thread(s) per core" => threads_per_core = rhs.trim().parse().expect("Failed to parse cpu threads"),
+            "core(s) per socket" => cores_per_socket = rhs.trim().parse().expect("Failed to parse cpu cores"),
+            "socket(s)" => n_sockets = rhs.trim().parse().expect("Failed to parse cpu freq"),
             _ => continue,
         }
     }
@@ -97,6 +109,9 @@ fn cpu_info() -> CPUInfo {
         model,
         min_mhz,
         max_mhz,
+        threads_per_core,
+        cores_per_socket,
+        n_sockets
     }
 }
 

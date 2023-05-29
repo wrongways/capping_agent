@@ -27,6 +27,9 @@ pub struct SystemInfo {
     pub online_cpus: u64,
     pub min_mhz: u64,
     pub max_mhz: u64,
+    pub threads_per_core: u64,
+    pub cores_per_socket: u64,
+    pub n_sockets: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
