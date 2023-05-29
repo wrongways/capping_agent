@@ -1,23 +1,17 @@
-use crate::rapl::rapl::{RAPL_Readings, RAPL_Reading, RAPL};
-use crate::ResultType;
+use crate::rapl::rapl::{RAPL_Readings, RAPL};
 use crate::model::{RaplData, RaplRecord};
 
-use chrono::SecondsFormat;
-use log::debug;
 use log::{info, trace};
-use std::fs::File;
-use std::io::{BufWriter, Write};
-use std::path::{Path, PathBuf};
-use std::sync::mpsc::Receiver;
 use std::thread;
 use std::time::Duration;
+use std::sync::mpsc::Receiver;
 
 const POLL_FREQ_HZ: u64 = 2;
 
 /// Periodically reads all the `energy_uj` files and saves the result. Runs on its own thread.
 /// Each time through the loop, checks for a message from the main monitor thread that signals
 /// that this thread can exit. Before exiting, saves results to CSV file.
-pub fn monitor_rapl(rx: &Receiver<()>) {
+pub fn monitor_rapl(rx: &Receiver<()>) -> Vec<RaplRecord> {
     info!("\tRAPL: launched");
 
     let mut stats = Vec::<RAPL_Readings>::new();
@@ -33,13 +27,13 @@ pub fn monitor_rapl(rx: &Receiver<()>) {
         stats.push(energy_reading);
         thread::sleep(Duration::from_millis(sleep_millis));
     }
-    convert_energy_to_power(stats)
+    convert_energy_to_power(&stats)
 }
 
 
 
 /// Does what it says on the packet - divides energy deltas by time deltas to give power.
-fn convert_energy_to_power(stats: &[RAPL_Readings]) -> Vec<RaplRecord> {
+fn convert_energy_to_power(stats: &Vec<RAPL_Readings>) -> Vec<RaplRecord> {
     // The units of reading are µJ
 
     let mut readings = Vec::with_capacity(stats.len());
@@ -80,12 +74,12 @@ fn convert_energy_to_power(stats: &[RAPL_Readings]) -> Vec<RaplRecord> {
             // time delta is always positive so no loss of sign - and in any case makes no difference
             #[allow(clippy::cast_sign_loss)]
             let power_watts = energy_delta_uj / time_delta.num_milliseconds() as u64;
-            power_readings.push(RAPL_Reading {
+            power_readings.push(RaplData {
                 domain: reading.domain.clone(),
                 power_watts,
             });
         }
-        let datapoint = RaplRecord {timestamp: time_midpoint, data: power_readings};
+        let datapoint = RaplRecord {timestamp: Some(time_midpoint), data: power_readings};
         readings.push(datapoint);
     }
     readings

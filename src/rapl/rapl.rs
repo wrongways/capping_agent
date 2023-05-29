@@ -80,16 +80,16 @@ impl RAPL {
     ///
     /// returns list of core energy values for all domains
     #[must_use]
-    pub fn read_current_energy(&self) -> RaplRecord {
-        let mut readings: Vec<RaplData> = Vec::new();
+    pub fn read_current_energy(&self) -> RAPL_Readings {
+        let mut readings: Vec<RAPL_Reading> = Vec::new();
         for (pkg_core, label) in [(&self.core_paths, "core"), (&self.pkg_paths, "pkg")] {
             for (domain_id, path) in pkg_core.iter() {
                 let energy = RAPL::read_energy(path);
                 let domain = format!("{label}{domain_id}");
-                readings.push(RaplData::new(&domain, energy));
+                readings.push(RAPL_Reading::new(&domain, energy));
             }
         }
-        RaplRecord::new(readings)
+        RAPL_Readings::new(readings)
     }
 
     // class method
