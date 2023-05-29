@@ -90,8 +90,8 @@ fn cpu_info() -> CPUInfo {
         match lhs.trim() {
             "CPU(s)" => cpu_count = rhs.trim().parse().expect("Failed to parse cpu count"),
             "Model name" => model = rhs.trim().to_string(),
-            "CPU min MHz" => min_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
-            "CPU max MHz" => max_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
+            "CPU min MHz" => min_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
+            "CPU max MHz" => max_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
             _ => continue,
         }
     }
