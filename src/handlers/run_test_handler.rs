@@ -1,19 +1,13 @@
 use axum::Json;
-use serde::Serialize;
 use crate::model::FirestarterParams;
 use crate::firestarter::Firestarter;
 use crate::rapl::monitor_rapl::monitor_rapl;
+use crate::model::RaplRecord;
 use std::sync::mpsc;
 use std::thread;
 
 
-#[derive(Debug, Serialize)]
-pub struct Rc {
-    pub wally: String,
-}
-
-
-pub async fn run_test_handler(Json(body): Json<FirestarterParams>) -> Json<Rc> {
+pub async fn run_test_handler(Json(body): Json<FirestarterParams>) -> Json<Vec<RaplRecord>> {
 
     println!("{body:?}");
     // start rapl monitor
@@ -31,5 +25,5 @@ pub async fn run_test_handler(Json(body): Json<FirestarterParams>) -> Json<Rc> {
         .expect("Failed to join rapl thread and receive data");
 
     println!("RAPL stats: {rapl_stats:?}");
-    Json(Rc{wally: String::from("was here")})
+    Json(rapl_stats)
 }
