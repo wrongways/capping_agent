@@ -11,10 +11,10 @@ const POLL_FREQ_HZ: u64 = 2;
 /// Periodically reads all the `energy_uj` files and saves the result. Runs on its own thread.
 /// Each time through the loop, checks for a message from the main monitor thread that signals
 /// that this thread can exit. Before exiting, saves results to CSV file.
-pub fn monitor_rapl(rx: &Receiver<()>) -> Vec<RaplRecord> {
+pub fn monitor_rapl(rx: &Receiver<()>, runtime_secs: u64) -> Vec<RaplRecord> {
     info!("\tRAPL: launched");
 
-    let mut stats = Vec::<RAPL_Readings>::new();
+    let mut stats = Vec::<RAPL_Readings>::with_capacity((POLL_FREQ_HZ * (runtime_secs + 5)) as usize);
     let rapl = RAPL::new();
     let sleep_millis = 1000 / POLL_FREQ_HZ;
     loop {
