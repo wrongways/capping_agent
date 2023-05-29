@@ -56,6 +56,15 @@ pub struct RaplData {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RaplRecord {
     #[serde(with = "ts_seconds_option")]
-    timestamp: Option<DateTime<Utc>>,
-    data: Vec<RaplData>,
+    pub timestamp: Option<DateTime<Utc>>,
+    pub data: Vec<RaplData>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FirestarterParams {
+    pub runtime_secs: u64,
+    pub load_pct: u64,
+    pub load_period_us: u64,
+    pub n_threads: u64,
+}
+
