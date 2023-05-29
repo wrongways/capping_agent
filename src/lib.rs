@@ -3,6 +3,8 @@ pub mod model;
 pub mod response;
 pub mod route;
 pub mod server;
+pub mod rapl;
+pub mod firestarter;
 
 use std::os::unix::fs::MetadataExt;
 
