@@ -23,6 +23,7 @@ struct SysInfo {
     os: String,
 }
 
+
 pub async fn system_info_handler() -> impl IntoResponse {
     let cpu_info = cpu_info();
     let sys_info = sys_info();
@@ -37,12 +38,7 @@ pub async fn system_info_handler() -> impl IntoResponse {
         max_mhz: cpu_info.max_mhz,
     };
 
-    let bios_info = BiosInfo {
-        vendor: "vendor".to_string(),
-        version: "version".to_string(),
-        revision: "revision".to_string(),
-        release_date: "release_date".to_string(),
-    };
+    let bios_info = bios();
 
     let server_info = ServerInfo {
         system_info,
@@ -159,6 +155,50 @@ fn os() -> String {
     }
     println!("os(): {os_name} {os_version}");
     format!("{os_name} {os_version}").replace('"', "")
+}
+
+fn bios() -> BiosInfo {
+    if am_root() {
+        let bios_info = String::from_utf8(
+            Command::new("dmidecode")
+                .arg("-q")
+                .arg("-t")
+                .arg("0")
+                .output()
+                .expect("Failed to run dmidecode")
+                .stdout)
+            .expect("Failed to extract dmi info");
+
+        let mut vendor = String::new();
+        let mut version = String::new();
+        let mut revision = String::new();
+        let mut release_date = String::new();
+
+        for line in bios_info.lines() {
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() == 2 {
+                let (lhs, rhs) = (parts[0], parts[1]);
+                match lhs.to_lowercase().trim() {
+                    "vendor" => vendor = rhs.trim().to_string(),
+                    "version" => version = rhs.trim().to_string(),
+                    "bios revision" => revision = rhs.trim().to_string(),
+                    "release date" => release_date = rhs.trim().to_string(),
+                    _ => continue,
+                }
+            }
+        }
+
+        BiosInfo {vendor, version, revision, release_date}
+
+    } else {
+        BiosInfo {
+            vendor: "unknown".to_string(),
+            version: "unknown".to_string(),
+            revision: "unknown".to_string(),
+            release_date: "unknown".to_string(),
+        }
+    }
+
 }
 
 #[cfg(test)]
