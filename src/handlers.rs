@@ -90,8 +90,8 @@ fn cpu_info() -> CPUInfo {
         match lhs.trim() {
             "CPU(s)" => cpu_count = rhs.trim().parse().expect("Failed to parse cpu count"),
             "Model name" => model = rhs.trim().to_string(),
-            "CPU min mhz" => min_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
-            "CPU max mhz" => max_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
+            "CPU min MHz" => min_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
+            "CPU max MHz" => max_mhz = rhs.trim().parse().expect("Failed to parse cpu freq"),
             _ => continue,
         }
     }
@@ -158,7 +158,7 @@ fn os() -> String {
         }
     }
     println!("os(): {os_name} {os_version}");
-    format!("{os_name} {os_version}")
+    format!("{os_name} {os_version}").replace('"', "")
 }
 
 #[cfg(test)]
