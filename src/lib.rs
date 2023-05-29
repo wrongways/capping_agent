@@ -11,5 +11,5 @@ fn am_root() -> bool {
     let uid = std::fs::metadata("/proc/self").map(|m| m.uid())
         .expect("Failed to read /proc/self");
     println!("UID: {uid}");
-    true
+    uid == 0
 }
