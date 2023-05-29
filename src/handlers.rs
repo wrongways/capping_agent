@@ -122,13 +122,13 @@ fn sys_info() -> SysInfo {
 
 
         // remove anything in parenthesis at the end.
-        let mut model = value["product"].to_string();
+        let mut model = value["product"].to_string().replace('"', "");
         if let Some(index) = model.find('(') {
             model.truncate(index);
         }
 
         SysInfo {
-            vendor: value["vendor"].to_string(),
+            vendor: value["vendor"].to_string().replace('"', ""),
             model,
             os: os(),
         }
