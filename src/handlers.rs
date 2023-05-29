@@ -3,7 +3,7 @@ use serde_json::{self, Value};
 use crate::am_root;
 use std::fs;
 
-use axum::{http::StatusCode, response::IntoResponse, Json};
+use axum::{response::IntoResponse, Json};
 
 use crate::{
     model::{BiosInfo, ServerInfo, SystemInfo},
@@ -52,7 +52,6 @@ pub async fn system_info_handler() -> impl IntoResponse {
     };
 
     let response = ServerInfoResponse {
-        status: StatusCode::OK.to_string(),
         server_info,
     };
 
