@@ -3,7 +3,7 @@ use std::fmt::{self, Display, Formatter};
 use std::process::Command;
 use crate::model::FirestarterParams;
 
-const FIRESTARTER_PATH: &str = "/home_nfs/wainj/local/bin/firestarter";
+const FIRESTARTER_PATH: &str = "/usr/local/bin/firestarter";
 
 #[derive(Debug)]
 /// Hold the firestarter configuration
