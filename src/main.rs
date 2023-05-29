@@ -1,8 +1,10 @@
 use clap::Parser;
 use agent::server;
+use simple_logger::SimpleLogger;
 
 #[tokio::main]
 async fn main() {
+    SimpleLogger::new().env().init().unwrap();
     let args = CLI::parse();
     let server = server::Server::new(&args.listen_address);
     server.run()
