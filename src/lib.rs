@@ -4,10 +4,12 @@ pub mod response;
 pub mod route;
 pub mod server;
 
+use std::os::unix::fs::MetadataExt;
+
 
 fn am_root() -> bool {
-    match std::env::var("USER") {
-        Ok(user) => user == "root",
-        Err(_e) => false,
-    }
+    let uid = std::fs::metadata("/proc/self").map(|m| m.uid())
+        .expect("Failed to read /proc/self");
+    println!("UID: {uid}");
+    true
 }
