@@ -97,9 +97,9 @@ fn cpu_info() -> CPUInfo {
             "Model name" => model = rhs.trim().to_string(),
             "CPU min MHz" => min_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
             "CPU max MHz" => max_mhz = rhs.trim().parse::<f64>().expect("Failed to parse cpu freq") as u64,
-            "thread(s) per core" => threads_per_core = rhs.trim().parse().expect("Failed to parse cpu threads"),
-            "core(s) per socket" => cores_per_socket = rhs.trim().parse().expect("Failed to parse cpu cores"),
-            "socket(s)" => n_sockets = rhs.trim().parse().expect("Failed to parse cpu freq"),
+            "Thread(s) per core" => threads_per_core = rhs.trim().parse().expect("Failed to parse cpu threads"),
+            "Core(s) per socket" => cores_per_socket = rhs.trim().parse().expect("Failed to parse cpu cores"),
+            "Socket(s)" => n_sockets = rhs.trim().parse().expect("Failed to parse cpu freq"),
             _ => continue,
         }
     }
