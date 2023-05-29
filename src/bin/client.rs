@@ -3,8 +3,8 @@ use log::info;
 
 use agent::model::FirestarterParams;
 
-const AGENT_INFO_ENDPOINT: &str = "http://oahu10000/api/system_info";
-const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000/api/run_test";
+const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
+const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
