@@ -1,8 +1,7 @@
 use axum::{response::IntoResponse, Json};
 use serde::Serialize;
+use serde_json::Value;
 
-
-use crate::model::FirestarterParams;
 
 #[derive(Debug, Serialize)]
 pub struct Rc {
@@ -10,7 +9,7 @@ pub struct Rc {
 }
 
 
-pub async fn run_test_handler(Json(body): Json<FirestarterParams>) -> Json<Rc> {
+pub async fn run_test_handler(Json(body): Json<Value>) -> Json<Rc> {
 
     println!("{body:?}");
     // start rapl monitor
