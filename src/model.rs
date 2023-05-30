@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc, serde::ts_milliseconds_option};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use std::fmt;
 
 pub type Semaphore = Arc<RwLock<bool>>;
 pub fn is_running() -> Semaphore {
@@ -60,3 +61,46 @@ pub struct FirestarterParams {
     pub n_threads: u64,
 }
 
+impl fmt::Display for SystemInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,
+            "          hostname: {}\n\
+                          model: {}\n\
+                             os: {}\n\
+                   manufacturer: {}\n\
+                            cpu: {}\n\
+                      cpu count: {}\n\
+                 min freq (MHz): {}\n\
+                 max freq (MHz): {}\n\
+               threads per core: {}\n\
+               cores per socket: {}\n\
+                   socket count: {}\n",
+            &self.hostname,
+            &self.model,
+            &self.os,
+            &self.manufacturer,
+            &self.cpu_version,
+            &self.online_cpus,
+            &self.min_mhz,
+            &self.max_mhz,
+            &self.threads_per_core,
+            &self.cores_per_socket,
+            &self.n_sockets
+        )
+    }
+}
+
+impl fmt::Display for BiosInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,
+        "            vendor: {}\n\
+                    version: {}\n\
+                   revision: {}\n\
+               release date: {}\n",
+            &self.vendor,
+            &self.version,
+            &self.revision,
+            &self.release_date
+        )
+    }
+}
