@@ -5,6 +5,7 @@ pub mod route;
 pub mod server;
 pub mod rapl;
 pub mod firestarter;
+pub mod bmc;
 
 use std::os::unix::fs::MetadataExt;
 
