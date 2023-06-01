@@ -4,12 +4,12 @@ use std::vec;
 
 use crate::test::{POWER_HIGH, POWER_LOW, CappingOrder, Operation, CapStep, Test};
 
-struct ThreadTestSuite {
-    iter: OrderOperationStepPowerThreadsIter,
+pub struct ThreadTestSuite {
+    pub iter: OrderOperationStepPowerThreadsIter,
 }
 
 impl ThreadTestSuite {
-    fn new(online_cores: u64) -> Self {
+    pub fn new(online_cores: u64) -> Self {
         let n_threads: Vec<u64> = (0..11).map(|t| online_cores - t).collect();
         Self {
             iter: iproduct!(
