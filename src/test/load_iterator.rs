@@ -1,12 +1,11 @@
-#[allow(dead_code, unused)]
-use enum_iterator::{all, All, Sequence};
+use enum_iterator::{all, All};
 use itertools::{iproduct, ConsTuples, Itertools, Permutations, Product};
 use std::vec;
 
 use crate::test::{POWER_HIGH, POWER_LOW, CappingOrder, Operation, CapStep, Test};
 
 
-impl TestSuite {
+impl LoadTestSuite {
     pub fn new() -> Self {
         let loads: Vec<u64> = (0..11).map(|p| 100 - p).collect();
         Self {
@@ -22,13 +21,13 @@ impl TestSuite {
     }
 }
 
-impl Default for TestSuite {
+impl Default for LoadTestSuite {
     fn default() -> Self {
-        TestSuite::new()
+        LoadTestSuite::new()
     }
 }
 
-impl Iterator for TestSuite {
+impl Iterator for LoadTestSuite {
     type Item = Test;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -50,7 +49,6 @@ impl Iterator for TestSuite {
     }
 }
 
-#[allow(unused)]
 type OrderOperationStepTuple = ((CappingOrder, Operation), CapStep);
 type OrderOperationStepPowerTuple = ((CappingOrder, Operation, CapStep), Vec<u64>);
 type OrderOperationStepPowerTupleLoadTuple = ((CappingOrder, Operation, CapStep, Vec<u64>), u64);
@@ -71,7 +69,7 @@ type OrderOperationsStepPowerLoadIter = ConsTuples<OrderOperationStepPowerLoad, 
 type OrderOperationsStepPowerLoadPeriodIter = ConsTuples<OrderOperationStepPowerLoadPeriod, OrderOperationStepPowerTupleLoadPeriodTuple>;
 
 
-pub struct TestSuite {
+pub struct LoadTestSuite {
     pub iter: OrderOperationsStepPowerLoadPeriodIter,
 }
 
