@@ -28,18 +28,18 @@ impl Iterator for ThreadTestSuite {
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some((capping_order, operation, step, power_levels, n_threads)) =
-            self.iter.next()
-        {
-            return Some(Test {
-                capping_order,
-                operation,
-                step,
-                cap_from: power_levels[0],
-                cap_to: power_levels[1],
-                load_pct: 0,
-                load_period: 0,
-                n_threads
-            });
+            self.iter.next() {
+                return Some(Self::Item {
+                    capping_order,
+                    operation,
+                    step,
+                    cap_from: power_levels[0],
+                    cap_to: power_levels[1],
+                    load_pct: 0,
+                    load_period: 0,
+                    n_threads
+                }
+            );
         }
         None
     }
