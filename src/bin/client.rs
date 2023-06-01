@@ -4,8 +4,7 @@ use std::sync::mpsc;
 use std::thread;
 use clap::Parser;
 
-use agent::model::{FirestarterParams, RaplRecord};
-use agent::response::ServerInfoResponse;
+use agent::model::{FirestarterParams, RaplRecord, ServerInfo};
 use agent::bmc::monitor_bmc::monitor_bmc;
 use agent::CLI;
 use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite};
@@ -20,7 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let args = CLI::parse();
 
-    let host_info: ServerInfoResponse = reqwest::get(AGENT_INFO_ENDPOINT)
+    let host_info: ServerInfo = reqwest::get(AGENT_INFO_ENDPOINT)
         .await?
         .json()
         .await?;
@@ -28,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Host info:\n{host_info:?}");
 
     let load_iterator = LoadTestSuite::new();
-    let thread_iterator = ThreadTestSuite::new(192);
+    let thread_iterator = ThreadTestSuite::new(host_info.system_info.online_cpus);
 
     for test in load_iterator.iter {
         println!("{test:?}")

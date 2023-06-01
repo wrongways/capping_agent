@@ -7,7 +7,6 @@ use axum::{response::IntoResponse, Json};
 
 use crate::{
     model::{BiosInfo, ServerInfo, SystemInfo},
-    response::ServerInfoResponse,
 };
 
 struct CPUInfo {
@@ -51,9 +50,7 @@ pub async fn system_info_handler() -> impl IntoResponse {
         bios_info,
     };
 
-    let response = serde_json::json!(ServerInfoResponse {
-        server_info,
-    });
+    let response = serde_json::json!(server_info);
 
     Json(response)
 }
