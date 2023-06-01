@@ -3,6 +3,10 @@ pub mod thread_iterator;
 
 use enum_iterator::Sequence;
 
+pub const LOAD_PERIODS_US: [u64; 2] = [10_000, 1_000_000];
+pub const POWER_HIGH: u64 = 580;
+pub const POWER_LOW: u64 = 200;
+
 #[derive(Debug)]
 pub struct Test {
     pub capping_order: CappingOrder,
@@ -35,8 +39,3 @@ pub enum Operation {
     Activate,
     Deactivate,
 }
-
-
-pub const LOAD_PERIODS_US: [u64; 2] = [10_000, 1_000_000];
-pub const POWER_HIGH: u64 = 580;
-pub const POWER_LOW: u64 = 200;
