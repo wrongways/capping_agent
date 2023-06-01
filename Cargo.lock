@@ -19,6 +19,7 @@ dependencies = [
  "glob",
  "hyper",
  "itertools",
+ "lazy_static",
  "log",
  "reqwest",
  "serde",

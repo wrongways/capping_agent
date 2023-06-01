@@ -13,6 +13,7 @@ enum-iterator = "1.4.1"
 glob = "0.3.1"
 hyper = { version = "0.14.26", features = ["full"] }
 itertools = "0.10.5"
+lazy_static = "1.4.0"
 log = "0.4.18"
 reqwest = { version = "0.11.18", default-features = false, features = ["rustls", "json", "serde_json", "gzip", "deflate"] }
 serde = { version = "1.0.163", features = ["derive"] }
