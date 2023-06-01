@@ -51,9 +51,9 @@ pub async fn system_info_handler() -> impl IntoResponse {
         bios_info,
     };
 
-    let response = ServerInfoResponse {
+    let response = serde_json::json!(ServerInfoResponse {
         server_info,
-    };
+    });
 
     Json(response)
 }

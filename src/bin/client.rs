@@ -3,9 +3,9 @@ use log::info;
 use std::sync::mpsc;
 use std::thread;
 use clap::Parser;
-use serde_json::Value;
 
 use agent::model::{FirestarterParams, RaplRecord};
+use agent::response::ServerInfoResponse;
 use agent::bmc::monitor_bmc::monitor_bmc;
 use agent::CLI;
 use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite};
@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let args = CLI::parse();
 
-    let host_info: Value = reqwest::get(AGENT_INFO_ENDPOINT)
+    let host_info: ServerInfoResponse = reqwest::get(AGENT_INFO_ENDPOINT)
         .await?
         .json()
         .await?;
