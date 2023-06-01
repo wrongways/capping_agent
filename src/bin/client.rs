@@ -8,7 +8,8 @@ use serde_json::Value;
 use agent::model::{FirestarterParams, RaplRecord};
 use agent::bmc::monitor_bmc::monitor_bmc;
 use agent::CLI;
-use agent::test::load_iterator::TestSuite;
+use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite};
+
 
 const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
 const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
@@ -26,7 +27,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Host info:\n{host_info:?}");
 
-    let _load_iterator = TestSuite::new();
+    let load_iterator = LoadTestSuite::new();
+    let thread_iterator = ThreadTestSuite::new(192);
+
+    for test in load_iterator.iter {
+        println!("{test:?}")
+    }
+
+    for test in thread_iterator.iter {
+        println!("{test:?}")
+    }
 
     // Start BMC monitor
     let (bmc_tx, bmc_rx) = mpsc::channel();
