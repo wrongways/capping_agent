@@ -1,3 +1,4 @@
+#[allow(clippy::module_inception)]
 pub mod bmc;
 pub mod monitor_bmc;
 use crate::bmc::bmc::BMC_CapSetting;
