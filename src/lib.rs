@@ -20,6 +20,9 @@ fn am_root() -> bool {
     uid == 0
 }
 
+const SETUP_PAUSE_MILLIS: u64 = 300;
+const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
+const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
 
 lazy_static! {
     /*
@@ -53,6 +56,9 @@ pub struct Configuration {
     pub test_timestamp: String,
     pub firestarter: String,
     pub ipmi: String,
+    pub setup_pause_millis: u64,
+    pub agent_info_endpoint: String,
+    pub agent_run_test_endpoint: String,
 }
 
 impl Configuration {
@@ -73,6 +79,9 @@ impl Configuration {
             test_timestamp,
             firestarter: args.firestarter,
             ipmi: args.ipmi,
+            setup_pause_millis: SETUP_PAUSE_MILLIS,
+            agent_info_endpoint: String::from(AGENT_INFO_ENDPOINT),
+            agent_run_test_endpoint: String::from(AGENT_RUN_TEST_ENDPOINT),
         }
     }
 }
