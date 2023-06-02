@@ -45,10 +45,20 @@ impl Iterator for ThreadTestSuite {
     }
 }
 
-type OrderOperationStepTuple = ((CappingOrder, Operation), CapStep);
-type OrderOperationStepPowerTuple = ((CappingOrder, Operation, CapStep), Vec<u64>);
-type OrderOperationStepPowerThreadsTuple = ((CappingOrder, Operation, CapStep, Vec<u64>), u64);
 
+// Sequential build-up of the type required by the ThreadTestIterator
+// If there's a better way to do this, then I haven't found it - it comes across as a big
+// code smell when the type definition takes up 30% of the code - can't the compiler infer?
+//
+// Building the structure is fairly straight forward, but easy to get wrong because
+// of the repetition and subtleties:
+//
+// For each step of the iterator:
+//      Create a product from the associated enums and the iterator created in the previous step
+//      Create a tuple representing the type being produced by the iterator
+//      Create an iterator (used in the next step) from the product and the type tuple
+//
+// Rinse and repeat until you've got all the components of iproduct!()
 
 type PowerPermutations = Permutations<IterU64>;
 type IterU64 = vec::IntoIter<u64>;
@@ -58,7 +68,11 @@ type OrderOperationStep = Product<OrderOperation, All<CapStep>>;
 type OrderOperationStepPower = Product<OrderOperationStepIter, PowerPermutations>;
 type OrderOperationStepPowerThreads = Product<OrderOperationStepPowerIter, IterU64>;
 
+type OrderOperationStepTuple = ((CappingOrder, Operation), CapStep);
+type OrderOperationStepPowerTuple = ((CappingOrder, Operation, CapStep), Vec<u64>);
+type OrderOperationStepPowerThreadsTuple = ((CappingOrder, Operation, CapStep, Vec<u64>), u64);
+
 type OrderOperationStepIter = ConsTuples<OrderOperationStep, OrderOperationStepTuple>;
 type OrderOperationStepPowerIter = ConsTuples<OrderOperationStepPower, OrderOperationStepPowerTuple>;
-type OrderOperationStepPowerThreadsIter = ConsTuples<OrderOperationStepPowerThreads, OrderOperationStepPowerThreadsTuple>;
-
+type OrderOperationStepPowerThreadsIter =
+    ConsTuples<OrderOperationStepPowerThreads, OrderOperationStepPowerThreadsTuple>;
