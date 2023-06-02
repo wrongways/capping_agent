@@ -53,7 +53,7 @@ pub struct RaplRecord {
     pub data: Vec<RaplData>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
 pub struct FirestarterParams {
     pub runtime_secs: u64,
     pub load_pct: u64,
