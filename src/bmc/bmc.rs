@@ -9,6 +9,7 @@ const BMC_SET_CAP_CMD: &str = "dcmi power set_limit limit";
 const BMC_ACTIVATE_CAP_CMD: &str = "dcmi power activate";
 const BMC_DEACTIVATE_CAP_CMD: &str = "dcmi power deactivate";
 
+#[derive(Clone)]
 pub struct BMC {
     pub hostname: String,
     pub username: String,
