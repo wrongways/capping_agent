@@ -100,7 +100,7 @@ fn start_bmc_monitor(rx_channel: Receiver<()>) -> task::JoinHandle<Vec<BMCStats>
 }
 
 fn launch_agent(client: Client, fs_params: FirestarterParams ) ->  task::JoinHandle<Vec<RaplRecord>> {
-    trace!("Sending request to agent: {fs_params:?}");
+    trace!("Sending request to agent: {}", &CONFIGURATION.agent_run_test_endpoint);
     task::spawn(async move {
         client
             .post(&CONFIGURATION.agent_run_test_endpoint)
