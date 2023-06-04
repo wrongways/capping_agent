@@ -9,9 +9,10 @@ pub mod test;
 
 use std::os::unix::fs::MetadataExt;
 use clap::Parser;
-use chrono::Local;
+use chrono::{DateTime, Utc, Local};
 use lazy_static::lazy_static;
 
+pub type Timestamps = (DateTime<Utc>, DateTime<Utc>, DateTime<Utc>);
 
 fn am_root() -> bool {
     let uid = std::fs::metadata("/proc/self").map(|m| m.uid())
@@ -53,7 +54,7 @@ pub struct Configuration {
     pub cap_low_watts: u64,
     pub cap_high_watts: u64,
     pub stats_dir: String,
-    pub test_timestamp: String,
+    pub test_start_timestamp: DateTime<Utc>,
     pub firestarter: String,
     pub ipmi: String,
     pub setup_pause_millis: u64,
@@ -64,8 +65,6 @@ pub struct Configuration {
 impl Configuration {
     fn new() -> Self {
         let args = CLI::parse();
-        let timestamp_format = "%y%m%d_%H%M";
-        let test_timestamp = Local::now().format(timestamp_format).to_string();
 
         Configuration {
             bmc_hostname: args.bmc_hostname,
@@ -76,13 +75,19 @@ impl Configuration {
             cap_low_watts: args.cap_low_watts,
             cap_high_watts: args.cap_high_watts,
             stats_dir: args.stats_dir,
-            test_timestamp,
+            test_start_timestamp: Utc::now(),
             firestarter: args.firestarter,
             ipmi: args.ipmi,
             setup_pause_millis: SETUP_PAUSE_MILLIS,
             agent_info_endpoint: String::from(AGENT_INFO_ENDPOINT),
             agent_run_test_endpoint: String::from(AGENT_RUN_TEST_ENDPOINT),
         }
+    }
+
+    pub fn log_timestamp(&self) -> String {
+        let local_time: DateTime<Local> = self.test_start_timestamp.into();
+        let timestamp_format = "%y%m%d_%H%M";
+        local_time.format(timestamp_format).to_string()
     }
 }
 
