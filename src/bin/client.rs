@@ -1,19 +1,23 @@
 use simple_logger::SimpleLogger;
 use log::info;
 use std::sync::mpsc::{self, Receiver};
+use std::path::{Path, PathBuf};
+use std::fs::{self, OpenOptions};
 use tokio::task;
 use tokio::time::{sleep, Duration};
 use reqwest::Client;
-use chrono::{Utc, DateTime};
+use chrono::Utc;
+use serde::Serialize;
 
+use agent::Timestamps;
 use agent::model::{FirestarterParams, RaplRecord, ServerInfo};
 use agent::bmc::monitor_bmc::monitor_bmc;
 use agent::bmc::{bmc::BMC, BMCStats};
-use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite, Test, CappingOrder, Operation};
+use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite, Test, TestRun, CappingOrder, Operation, TestSuiteInfo};
 use agent::CONFIGURATION;
 
 
-type Timestamps = (DateTime<Utc>, DateTime<Utc>, DateTime<Utc>);
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,14 +44,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for test in thread_tests {
         info!("{test:?}");
         let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
-        let (start, cap, end) = timestamps;
+        let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
 
         info!("RAPL stats\n{rapl_stats:?}");
         info!("BMC Stats\n{bmc_stats:?}");
-        info!("Start, cap, end timestamps: {start}, {cap}, {end}");
+        info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
 
-        log_results(&server_info, &test, &rapl_stats, &bmc_stats, &timestamps);
+        let test_run = TestRun::new(timestamps, test);
+        log_results(&test_run, &rapl_stats, &bmc_stats);
     }
+
+    // All done, so OK to pass ownership here
+    log_server_info(server_info);
 
     Ok(())
 }
@@ -171,8 +179,46 @@ async fn get_server_info(client: &Client ) -> ServerInfo {
 }
 
 
-fn log_results(server_info: &ServerInfo, config: &Test, rapl_stats: &Vec<RaplRecord>, bmc_stats: &Vec<BMCStats>, timestamps: &Timestamps) {
+fn log_results(test: &TestRun, rapl_stats: &Vec<RaplRecord>, bmc_stats: &Vec<BMCStats>) {
+    // create the stats directory
+    let stats_path = Path::new(&CONFIGURATION.stats_dir);
+    fs::create_dir_all(stats_path).expect("Failed to create stats directory");
 
+    let mut path = PathBuf::from(stats_path);
+    path.push(format!("test_config_{}.json", CONFIGURATION.log_timestamp()));
+    write_json_file(&path, test);
+
+    path = PathBuf::from(stats_path);
+    path.push(format!("bmc_stats_{}.json", CONFIGURATION.log_timestamp()));
+    write_json_file(&path, bmc_stats);
+
+    path = PathBuf::from(stats_path);
+    path.push(format!("rapl_stats_{}.json", CONFIGURATION.log_timestamp()));
+    write_json_file(&path, rapl_stats);
+}
+
+fn log_server_info(server_info: ServerInfo)  {
+    let stats_path = PathBuf::from(
+        &format!("{}/server_info_{}.json",
+        &CONFIGURATION.stats_dir,
+        CONFIGURATION.log_timestamp()));
+
+    let test_suite_info = TestSuiteInfo {
+        start_timestamp: CONFIGURATION.test_start_timestamp,
+        end_timestamp: Utc::now(),
+        server_info,
+    };
+    write_json_file(&stats_path, &test_suite_info);
+
+}
+
+fn write_json_file<T>(path: &PathBuf, json: &T) where T: ?Sized + Serialize {
+    let handle = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(path)
+        .expect("Failed to open file");
+    serde_json::to_writer_pretty(&handle, json).expect("Failed to write json");
 }
 
 

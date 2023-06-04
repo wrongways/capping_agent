@@ -3,10 +3,11 @@ pub mod bmc;
 pub mod monitor_bmc;
 use crate::bmc::bmc::BMC_CapSetting;
 
+use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
 
 #[allow(non_camel_case_types)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BMCStats {
     pub timestamp: DateTime<Utc>,
     pub power: u64,
