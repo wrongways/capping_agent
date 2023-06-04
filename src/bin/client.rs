@@ -154,7 +154,7 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
         }
     };
     trace!("initial_conditions set - pause before return");
-    sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+    // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
     trace!("exiting setup_initial_conditions()");
 }
 
