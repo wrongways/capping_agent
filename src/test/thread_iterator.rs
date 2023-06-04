@@ -35,7 +35,7 @@ impl Iterator for ThreadTestSuite {
                     step,
                     cap_from: power_levels[0],
                     cap_to: power_levels[1],
-                    load_pct: 0,
+                    load_pct: 100,
                     load_period: 0,
                     n_threads
                 }
