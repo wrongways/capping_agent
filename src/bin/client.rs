@@ -78,13 +78,13 @@ async fn run_test(config: &Test, runtime_secs: u64, client: &Client, bmc: &BMC) 
     };
 
     trace!("Setting initial conditions");
-    set_initial_conditions(config, bmc);
+    set_initial_conditions(config, bmc).await;
     trace!("launching agent");
     let agent_thread = launch_agent(client.clone(), fs_params);
 
     //  Wait for warmup seconds
     trace!("Sleeping for warmup period");
-    sleep(Duration::from_secs(CONFIGURATION.warmup_secs));
+    sleep(Duration::from_secs(CONFIGURATION.warmup_secs)).await;
     trace!("Doing cap_operation");
     let cap_timestamp = Utc::now();
     do_cap_operation(config, bmc);
