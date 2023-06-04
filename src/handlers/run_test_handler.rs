@@ -1,8 +1,7 @@
-use axum::Json;
+use axum::{Json, response::IntoResponse, http::StatusCode};
 use crate::model::FirestarterParams;
 use crate::firestarter::Firestarter;
 use crate::rapl::monitor_rapl::monitor_rapl;
-use crate::model::RaplRecord;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
@@ -10,7 +9,7 @@ use log::trace;
 
 const RAPL_END_DELAY_SECS: u64 = 1;
 
-pub async fn run_test_handler(Json(firestarter_params): Json<FirestarterParams>) -> Json<Vec<RaplRecord>> {
+pub async fn run_test_handler(Json(firestarter_params): Json<FirestarterParams>) -> impl IntoResponse {
     trace!("run_test_handler({firestarter_params:?})");
     // start rapl monitor
     let (rapl_tx, rapl_rx) = mpsc::channel();
@@ -30,5 +29,5 @@ pub async fn run_test_handler(Json(firestarter_params): Json<FirestarterParams>)
         .expect("Failed to join rapl thread and receive data");
     trace!("Joinined rapl thread");
     println!("RAPL stats: {rapl_stats:?}");
-    Json(rapl_stats)
+    (StatusCode::OK, Json(rapl_stats))
 }
