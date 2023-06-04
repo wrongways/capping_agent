@@ -36,10 +36,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
 
 
-
+`   /*`
     for test in load_tests {
         trace!("{test:?}");
     }
+    */
 
     for test in thread_tests {
         info!("* * * * {test:?}");
@@ -76,16 +77,19 @@ async fn run_test(config: &Test, runtime_secs: u64, client: &Client, bmc: &BMC) 
         n_threads: config.n_threads
     };
 
-
+    trace!("Setting initial conditions");
     set_initial_conditions(config, bmc).await;
+    trace!("launching agent");
     let agent_thread = launch_agent(client.clone(), fs_params);
 
     //  Wait for warmup seconds
+    trace!("Sleeping for warmup period");
     sleep(Duration::from_secs(CONFIGURATION.warmup_secs)).await;
+    trace!("Doing cap_operation");
     let cap_timestamp = Utc::now();
     do_cap_operation(config, bmc);
 
-
+    trace!("Joining agent thread (firestarter exit)");
     let rapl_stats: Vec<RaplRecord> = agent_thread.await.expect("");
 
     bmc_tx.send(()).expect("Failed to signal BMC thread");
@@ -102,6 +106,7 @@ fn start_bmc_monitor(rx_channel: Receiver<()>) -> task::JoinHandle<Vec<BMCStats>
 fn launch_agent(client: Client, fs_params: FirestarterParams ) ->  task::JoinHandle<Vec<RaplRecord>> {
     trace!("Sending request to agent: {}", &CONFIGURATION.agent_run_test_endpoint);
     task::spawn(async move {
+        trace!("Agent thread posting to {}", &CONFIGURATION.agent_run_test_endpoint);
         client
             .post(&CONFIGURATION.agent_run_test_endpoint)
             .json(&fs_params)
