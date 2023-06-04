@@ -78,7 +78,7 @@ async fn run_test(config: &Test, runtime_secs: u64, client: &Client, bmc: &BMC) 
     };
 
     trace!("Setting initial conditions");
-    set_initial_conditions(config, bmc).await;
+    set_initial_conditions(config, bmc);
     trace!("launching agent");
     let agent_thread = launch_agent(client.clone(), fs_params);
 
@@ -120,7 +120,7 @@ fn launch_agent(client: Client, fs_params: FirestarterParams ) ->  task::JoinHan
 }
 
 
-async fn set_initial_conditions(config: &Test, bmc: &BMC) {
+fn set_initial_conditions(config: &Test, bmc: &BMC) {
     trace!("starting setup_initial_conditions()");
     match config.capping_order {
         CappingOrder::LevelBeforeActivate => {
@@ -128,7 +128,7 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
             // capping activation to the opposite of the test
 
             bmc.set_cap_power_level(config.cap_to);
-            sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
 
             match config.operation {
                 Operation::Activate => bmc.deactivate_power_cap(),
@@ -139,7 +139,7 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
             // set the capping level to the "cap_from" value
             // and the capping activation to the value for the test
             bmc.set_cap_power_level(config.cap_from);
-            sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
 
             match config.operation {
                 Operation::Activate => bmc.activate_power_cap(),
@@ -149,12 +149,12 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
         CappingOrder::LevelToLevel | CappingOrder::LevelToLevelActivate => {
             // set cap level and activate capping
             bmc.set_cap_power_level(config.cap_from);
-            sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
             bmc.activate_power_cap();
         }
     };
     trace!("initial_conditions set - pause before return");
-    sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+    // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
     trace!("exiting setup_initial_conditions()");
 }
 
