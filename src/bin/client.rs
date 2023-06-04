@@ -121,6 +121,7 @@ fn launch_agent(client: Client, fs_params: FirestarterParams ) ->  task::JoinHan
 
 
 async fn set_initial_conditions(config: &Test, bmc: &BMC) {
+    trace!("starting setup_initial_conditions()");
     match config.capping_order {
         CappingOrder::LevelBeforeActivate => {
             // Set the level to the "cap_to" value, and the
@@ -152,7 +153,9 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
             bmc.activate_power_cap();
         }
     };
+    trace!("initial_conditions set - pause before return");
     sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+    trace!("exiting setup_initial_conditions()");
 }
 
 fn do_cap_operation(config: &Test, bmc: &BMC) {
