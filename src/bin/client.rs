@@ -30,13 +30,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Host info:\n{server_info:?}");
 
 
-    let load_tests = LoadTestSuite::new();
+    // let load_tests = LoadTestSuite::new();
     let thread_tests = ThreadTestSuite::new(server_info.system_info.online_cpus);
 
     let total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
 
 
-`   /*`
+    /*`
     for test in load_tests {
         trace!("{test:?}");
     }
