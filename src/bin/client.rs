@@ -1,5 +1,5 @@
 use simple_logger::SimpleLogger;
-use log::info;
+use log::{trace, info};
 use std::sync::mpsc::{self, Receiver};
 use std::path::{Path, PathBuf};
 use std::fs::{self, OpenOptions};
@@ -38,11 +38,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
     for test in load_tests {
-        println!("{test:?}");
+        trace!("{test:?}");
     }
 
     for test in thread_tests {
-        info!("{test:?}");
+        info!("* * * * {test:?}");
         let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
         let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
 
@@ -62,6 +62,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn run_test(config: &Test, runtime_secs: u64, client: &Client, bmc: &BMC) ->
     Result<(Vec<RaplRecord>, Vec<BMCStats>, Timestamps), Box<dyn std::error::Error>> {
+
+    trace!("Running test: {config:?}");
 
     let start_timestamp = Utc::now();
     let (bmc_tx, bmc_rx) = mpsc::channel();
@@ -98,6 +100,7 @@ fn start_bmc_monitor(rx_channel: Receiver<()>) -> task::JoinHandle<Vec<BMCStats>
 }
 
 fn launch_agent(client: Client, fs_params: FirestarterParams ) ->  task::JoinHandle<Vec<RaplRecord>> {
+    trace!("Sending request to agent: {fs_params:?}");
     task::spawn(async move {
         client
             .post(&CONFIGURATION.agent_run_test_endpoint)
@@ -148,6 +151,7 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
 }
 
 fn do_cap_operation(config: &Test, bmc: &BMC) {
+    trace!("do_cap_operation()");
     match config.capping_order {
         CappingOrder::LevelBeforeActivate => {
             // The capping level is set by set_initial_conditions
