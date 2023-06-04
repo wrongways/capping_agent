@@ -4,10 +4,11 @@ use std::sync::mpsc::{self, Receiver};
 use std::path::{Path, PathBuf};
 use std::fs::{self, OpenOptions};
 use tokio::task;
-use tokio::time::{sleep, Duration};
+use tokio::time::Duration;
 use reqwest::Client;
 use chrono::Utc;
 use serde::Serialize;
+use std::thread;
 
 use agent::Timestamps;
 use agent::model::{FirestarterParams, RaplRecord, ServerInfo};
@@ -84,7 +85,7 @@ async fn run_test(config: &Test, runtime_secs: u64, client: &Client, bmc: &BMC) 
 
     //  Wait for warmup seconds
     trace!("Sleeping for warmup period");
-    sleep(Duration::from_secs(CONFIGURATION.warmup_secs)).await;
+    thread::sleep(Duration::from_secs(CONFIGURATION.warmup_secs));
     trace!("Doing cap_operation");
     let cap_timestamp = Utc::now();
     do_cap_operation(config, bmc);
@@ -128,7 +129,7 @@ fn set_initial_conditions(config: &Test, bmc: &BMC) {
             // capping activation to the opposite of the test
 
             bmc.set_cap_power_level(config.cap_to);
-            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            thread::sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis));
 
             match config.operation {
                 Operation::Activate => bmc.deactivate_power_cap(),
@@ -139,7 +140,7 @@ fn set_initial_conditions(config: &Test, bmc: &BMC) {
             // set the capping level to the "cap_from" value
             // and the capping activation to the value for the test
             bmc.set_cap_power_level(config.cap_from);
-            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            thread::sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis));
 
             match config.operation {
                 Operation::Activate => bmc.activate_power_cap(),
@@ -149,12 +150,12 @@ fn set_initial_conditions(config: &Test, bmc: &BMC) {
         CappingOrder::LevelToLevel | CappingOrder::LevelToLevelActivate => {
             // set cap level and activate capping
             bmc.set_cap_power_level(config.cap_from);
-            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+            thread::sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis));
             bmc.activate_power_cap();
         }
     };
     trace!("initial_conditions set - pause before return");
-    // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
+    thread::sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis));
     trace!("exiting setup_initial_conditions()");
 }
 
