@@ -3,6 +3,7 @@ use log::{trace, info};
 use std::sync::mpsc::{self, Receiver};
 use std::path::{Path, PathBuf};
 use std::fs::{self, OpenOptions};
+use std::io::Write;
 use tokio::task;
 use tokio::time::{Duration, sleep};
 use reqwest::Client;
@@ -231,6 +232,7 @@ fn write_json_file<T>(path: &PathBuf, json: &T) where T: ?Sized + Serialize {
         .open(path)
         .expect("Failed to open file");
     serde_json::to_writer_pretty(&handle, json).expect("Failed to write json");
+    writeln!(&handle, "").expect("Failed to append new line to json file");
 }
 
 
