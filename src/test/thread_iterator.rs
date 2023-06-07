@@ -10,7 +10,8 @@ pub struct ThreadTestSuite {
 
 impl ThreadTestSuite {
     pub fn new(online_cores: u64) -> Self {
-        let n_threads: Vec<u64> = (0..11).map(|t| online_cores - t).collect();
+        // TODO: This 3 is here for testing only - make it 10 when done
+        let n_threads: Vec<u64> = (0..3).map(|t| online_cores - t).collect();
         Self {
             iter: iproduct!(
                 all::<CappingOrder>(),
@@ -48,7 +49,7 @@ impl Iterator for ThreadTestSuite {
 
 // Sequential build-up of the type required by the ThreadTestIterator
 // If there's a better way to do this, then I haven't found it - it comes across as a big
-// code smell when the type definition takes up 30% of the code - can't the compiler infer?
+// code smell when the type definition takes up ~40% of the code - can't the compiler infer?
 //
 // Building the structure is fairly straight forward, but easy to get wrong because
 // of the repetition and subtleties:

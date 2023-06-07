@@ -4,7 +4,6 @@ use std::vec;
 
 use crate::test::{POWER_HIGH, POWER_LOW, CappingOrder, Operation, CapStep, Test};
 
-
 impl LoadTestSuite {
     pub fn new() -> Self {
         let loads: Vec<u64> = (0..11).map(|p| 100 - p).collect();
