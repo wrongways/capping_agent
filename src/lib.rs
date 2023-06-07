@@ -24,6 +24,8 @@ fn am_root() -> bool {
 const SETUP_PAUSE_MILLIS: u64 = 300;
 const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
 const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
+const CAP_STEP_SIZE_WATTS: u64 = 20;
+const CAP_STEP_INTERVAL_SECS: u64 = 4;
 
 lazy_static! {
     /*
@@ -53,6 +55,8 @@ pub struct Configuration {
     pub test_time_secs: u64,
     pub cap_low_watts: u64,
     pub cap_high_watts: u64,
+    pub cap_step_size_watts: u64,
+    pub cap_step_interval_secs: u64,
     pub stats_dir: String,
     pub test_start_timestamp: DateTime<Utc>,
     pub firestarter: String,
@@ -74,6 +78,8 @@ impl Configuration {
             test_time_secs: args.test_time,
             cap_low_watts: args.cap_low_watts,
             cap_high_watts: args.cap_high_watts,
+            cap_step_size_watts: CAP_STEP_SIZE_WATTS,
+            cap_step_interval_secs: CAP_STEP_INTERVAL_SECS,
             stats_dir: args.stats_dir,
             test_start_timestamp: Utc::now(),
             firestarter: args.firestarter,
