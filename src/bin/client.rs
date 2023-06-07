@@ -3,7 +3,7 @@ use log::{trace, info};
 use std::sync::mpsc::{self, Receiver};
 use std::path::{Path, PathBuf};
 use std::fs::{self, OpenOptions};
-use std::io::Write;
+use std::thread; // **** Is this OK with Tokio?  ****
 use tokio::task;
 use tokio::time::{Duration, sleep};
 use reqwest::Client;
@@ -14,7 +14,7 @@ use agent::Timestamps;
 use agent::model::{FirestarterParams, RaplRecord, ServerInfo};
 use agent::bmc::monitor_bmc::monitor_bmc;
 use agent::bmc::{bmc::BMC, BMCStats};
-use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite, Test, TestRun, CappingOrder, Operation, TestSuiteInfo};
+use agent::test::{load_iterator::LoadTestSuite, thread_iterator::ThreadTestSuite, Test, TestRun, CappingOrder, Operation, TestSuiteInfo, CapStep};
 use agent::CONFIGURATION;
 
 
@@ -30,14 +30,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server_info = get_server_info(&client).await;
     info!("Host info:\n{server_info:?}");
 
+    // buffers to hold the collected statistics
+    let mut runs: Vec<TestRun> = Vec::new();
+    let mut all_bmc_stats: Vec<Vec<BMCStats>> = Vec::new();
+    let mut all_rapl_stats: Vec<Vec<RaplRecord>> = Vec::new();
+
 
     // let load_tests = LoadTestSuite::new();
     let thread_tests = ThreadTestSuite::new(server_info.system_info.online_cpus);
-
     let total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
 
 
-    /*`
+    /*
     for test in load_tests {
         trace!("{test:?}");
     }
@@ -53,10 +57,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
 
         let test_run = TestRun::new(timestamps, test);
-        log_results(&test_run, &rapl_stats, &bmc_stats);
+        runs.push(test_run);
+        all_bmc_stats.push(bmc_stats);
+        all_rapl_stats.push(rapl_stats);
     }
 
     // All done, so OK to pass ownership here
+    log_results(runs, all_rapl_stats, all_bmc_stats);
     log_server_info(server_info);
 
     Ok(())
@@ -171,7 +178,19 @@ fn do_cap_operation(config: &Test, bmc: &BMC) {
             }
         }
         CappingOrder::LevelAfterActivate | CappingOrder::LevelToLevel => {
-            bmc.set_cap_power_level(config.cap_to);
+            if config.step == CapStep::OneShot {
+                bmc.set_cap_power_level(config.cap_to);
+            } else {
+                let mut current_cap = config.cap_from - CONFIGURATION.cap_step_size_watts;
+                while current_cap > config.cap_to {
+                    bmc.set_cap_power_level(current_cap);
+                    current_cap -= CONFIGURATION.cap_step_size_watts;
+                    thread::sleep(Duration::from_secs(CONFIGURATION.cap_step_interval_secs));
+                }
+                if current_cap != config.cap_to {
+                    bmc.set_cap_power_level(config.cap_to);
+                }
+            }
         }
         CappingOrder::LevelToLevelActivate => {
             bmc.set_cap_power_level(config.cap_to);
@@ -192,22 +211,22 @@ async fn get_server_info(client: &Client ) -> ServerInfo {
 }
 
 
-fn log_results(test: &TestRun, rapl_stats: &Vec<RaplRecord>, bmc_stats: &Vec<BMCStats>) {
+fn log_results(tests: Vec<TestRun>, rapl_stats: Vec<Vec<RaplRecord>>, bmc_stats: Vec<Vec<BMCStats>>) {
     // create the stats directory
     let stats_path = Path::new(&CONFIGURATION.stats_dir);
     fs::create_dir_all(stats_path).expect("Failed to create stats directory");
 
     let mut path = PathBuf::from(stats_path);
     path.push(format!("test_config_{}.json", CONFIGURATION.log_timestamp()));
-    write_json_file(&path, test);
+    write_json_file(&path, &tests);
 
     path = PathBuf::from(stats_path);
     path.push(format!("bmc_stats_{}.json", CONFIGURATION.log_timestamp()));
-    write_json_file(&path, bmc_stats);
+    write_json_file(&path, &bmc_stats);
 
     path = PathBuf::from(stats_path);
     path.push(format!("rapl_stats_{}.json", CONFIGURATION.log_timestamp()));
-    write_json_file(&path, rapl_stats);
+    write_json_file(&path, &rapl_stats);
 }
 
 fn log_server_info(server_info: ServerInfo)  {
@@ -232,7 +251,6 @@ fn write_json_file<T>(path: &PathBuf, json: &T) where T: ?Sized + Serialize {
         .open(path)
         .expect("Failed to open file");
     serde_json::to_writer_pretty(&handle, json).expect("Failed to write json");
-    writeln!(&handle, "").expect("Failed to append new line to json file");
 }
 
 
