@@ -3,7 +3,7 @@ use log::{trace, info};
 use std::sync::mpsc::{self, Receiver};
 use std::path::{Path, PathBuf};
 use std::fs::{self, OpenOptions};
-use std::thread; // **** Is this OK with Tokio?  ****
+use std::thread; // OK to mix threads with Tokio
 use tokio::task;
 use tokio::time::{Duration, sleep};
 use reqwest::Client;
