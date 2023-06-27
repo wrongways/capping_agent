@@ -36,19 +36,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut all_rapl_stats: Vec<Vec<RaplRecord>> = Vec::new();
 
 
-    // let load_tests = LoadTestSuite::new();
+    let load_tests = LoadTestSuite::new();
     let thread_tests = ThreadTestSuite::new(server_info.system_info.online_cpus);
     let total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
 
 
-    /*
     for test in load_tests {
-        trace!("{test:?}");
+        info!("{test:?}");
+        let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
+        let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
+
+        info!("RAPL stats\n{rapl_stats:?}");
+        info!("BMC Stats\n{bmc_stats:?}");
+        info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
+
+        let test_run = TestRun::new(timestamps, test);
+        runs.push(test_run);
+        all_bmc_stats.push(bmc_stats);
+        all_rapl_stats.push(rapl_stats);
     }
-    */
 
     for test in thread_tests {
-        info!("* * * * {test:?}");
+        info!("{test:?}");
         let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
         let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
 
