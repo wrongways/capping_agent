@@ -63,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // All done, so OK to pass ownership here
-    save_results(runs, all_rapl_stats, all_bmc_stats);
+    save_logs(runs, all_rapl_stats, all_bmc_stats);
     log_server_info(server_info);
 
     Ok(())
@@ -211,7 +211,7 @@ async fn get_server_info(client: &Client ) -> ServerInfo {
 }
 
 
-fn save_results(tests: Vec<TestRun>, rapl_stats: Vec<Vec<RaplRecord>>, bmc_stats: Vec<Vec<BMCStats>>) {
+fn save_logs(tests: Vec<TestRun>, rapl_stats: Vec<Vec<RaplRecord>>, bmc_stats: Vec<Vec<BMCStats>>) {
     // create the stats directory
     let stats_path = Path::new(&CONFIGURATION.stats_dir);
     fs::create_dir_all(stats_path).expect("Failed to create stats directory");
