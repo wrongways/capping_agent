@@ -22,8 +22,11 @@ fn am_root() -> bool {
 }
 
 const SETUP_PAUSE_MILLIS: u64 = 300;
+
+// TODO: hostname:port of the agent MUST become part of CLI
 const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
 const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
+
 const CAP_STEP_SIZE_WATTS: u64 = 20;
 const CAP_STEP_INTERVAL_SECS: u64 = 4;
 
