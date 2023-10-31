@@ -12,7 +12,7 @@ const BMC_POLL_INTERVAL_MILLIS: u64 = 500;
 
 /// Periodically polls the BMC for power reading and saves the result. Runs on its own thread.
 /// Each time through the loop, checks for a message from the main monitor thread that signals
-/// that this thread can exit. Before exiting, saves results to CSV file.
+/// that this thread can exit.
 pub fn monitor_bmc(rx: Receiver<()>) -> Vec::<BMCStats> {
     info!("\tBMC: launched");
 

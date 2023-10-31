@@ -38,11 +38,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let load_tests = LoadTestSuite::new();
     let thread_tests = ThreadTestSuite::new(server_info.system_info.online_cpus);
-    let total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
+
+    // Calculate extra time required for stepped tests
+
+    // How many steps are required?
+    let cap_power_delta = CONFIGURATION.cap_high_watts - CONFIGURATION.cap_low_watts;
+    let cap_step_count = (cap_power_delta as f64 / CONFIGURATION.cap_step_size_watts as f64).ceil() as u64;
+    let step_time = (cap_step_count + 1) * CONFIGURATION.cap_step_interval_secs;
+
+    let mut total_runtime_secs = CONFIGURATION.warmup_secs + CONFIGURATION.test_time_secs;
 
 
     for test in load_tests {
         info!("{test:?}");
+
+        if test.step == CapStep::Step {
+            total_runtime_secs += step_time;
+        }
+
         let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
         let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
 
@@ -58,6 +71,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     for test in thread_tests {
         info!("{test:?}");
+
+        if test.step == CapStep::Step {
+            total_runtime_secs += step_time;
+        }
+
         let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
         let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
 
@@ -190,15 +208,21 @@ fn do_cap_operation(config: &Test, bmc: &BMC) {
             if config.step == CapStep::OneShot {
                 bmc.set_cap_power_level(config.cap_to);
             } else {
-                let mut current_cap = config.cap_from - CONFIGURATION.cap_step_size_watts;
-                while current_cap > config.cap_to {
+                // Step up/down the cap
+                let mut current_cap = config.cap_from;
+
+                // ensure step size won't overshoot the cap_to value
+                while (current_cap as i64 - config.cap_to as i64).unsigned_abs() > CONFIGURATION.cap_step_size_watts {
+                    if config.cap_from > config.cap_to {
+                        current_cap -= CONFIGURATION.cap_step_size_watts;
+                    } else {
+                        current_cap += CONFIGURATION.cap_step_size_watts;
+                    }
                     bmc.set_cap_power_level(current_cap);
-                    current_cap -= CONFIGURATION.cap_step_size_watts;
                     thread::sleep(Duration::from_secs(CONFIGURATION.cap_step_interval_secs));
                 }
-                if current_cap != config.cap_to {
-                    bmc.set_cap_power_level(config.cap_to);
-                }
+                // set the final value
+                bmc.set_cap_power_level(config.cap_to);
             }
         }
         CappingOrder::LevelToLevelActivate => {
