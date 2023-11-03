@@ -234,6 +234,7 @@ fn do_cap_operation(config: &Test, bmc: &BMC) {
 
 
 async fn get_server_info(client: &Client ) -> ServerInfo {
+    trace!("get_server_info endpoint: {}", &CONFIGURATION.agent_info_endpoint);
     client.get(&CONFIGURATION.agent_info_endpoint)
     .send()
     .await
