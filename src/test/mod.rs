@@ -8,9 +8,11 @@ use enum_iterator::Sequence;
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
 
-pub const LOAD_PERIODS_US: [u64; 2] = [10_000, 1_000_000];
+// pub const LOAD_PERIODS_US: [u64; 2] = [10_000, 1_000_000];
+pub const LOAD_PERIODS_US: [u64; 1] = [10_000];
+
 pub const POWER_HIGH: u64 = 580;
-pub const POWER_LOW: u64 = 200;
+pub const POWER_LOW: u64 = 230;
 
 type Timestamp = DateTime<Utc>;
 

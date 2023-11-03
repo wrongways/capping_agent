@@ -14,7 +14,8 @@ impl LoadTestSuite {
                 all::<CapStep>(),
                 vec![POWER_LOW, POWER_HIGH].into_iter().permutations(2),
                 loads,
-                vec![10_000, 1_000_000]
+                // vec![10_000, 1_000_000]
+                vec![10_000]
             ),
         }
     }
