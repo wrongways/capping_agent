@@ -24,8 +24,10 @@ fn am_root() -> bool {
 const SETUP_PAUSE_MILLIS: u64 = 300;
 
 // TODO: hostname:port of the agent MUST become part of CLI
-const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
-const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
+// const AGENT_INFO_ENDPOINT: &str = "http://oahu10000:8000/api/system_info";
+// const AGENT_RUN_TEST_ENDPOINT: &str = "http://oahu10000:8000/api/run_test";
+const AGENT_INFO_ENDPOINT: &str = "/api/system_info";
+const AGENT_RUN_TEST_ENDPOINT: &str = "/api/run_test";
 
 const CAP_STEP_SIZE_WATTS: u64 = 20;
 const CAP_STEP_INTERVAL_SECS: u64 = 4;
@@ -62,7 +64,7 @@ pub struct Configuration {
     pub cap_step_interval_secs: u64,
     pub stats_dir: String,
     pub test_start_timestamp: DateTime<Utc>,
-    pub firestarter: String,
+    // pub firestarter: String,
     pub ipmi: String,
     pub setup_pause_millis: u64,
     pub agent_info_endpoint: String,
@@ -72,6 +74,7 @@ pub struct Configuration {
 impl Configuration {
     fn new() -> Self {
         let args = CLI::parse();
+        let agent = args.agent;
 
         Configuration {
             bmc_hostname: args.bmc_hostname,
@@ -85,11 +88,11 @@ impl Configuration {
             cap_step_interval_secs: CAP_STEP_INTERVAL_SECS,
             stats_dir: args.stats_dir,
             test_start_timestamp: Utc::now(),
-            firestarter: args.firestarter,
+            // firestarter: args.firestarter,
             ipmi: args.ipmi,
             setup_pause_millis: SETUP_PAUSE_MILLIS,
-            agent_info_endpoint: String::from(AGENT_INFO_ENDPOINT),
-            agent_run_test_endpoint: String::from(AGENT_RUN_TEST_ENDPOINT),
+            agent_info_endpoint: format!("{agent}{AGENT_INFO_ENDPOINT}"),
+            agent_run_test_endpoint: format!("{agent}{AGENT_RUN_TEST_ENDPOINT}"),
         }
     }
 
@@ -120,6 +123,10 @@ struct CLI {
 
     #[arg(long, short = 'P', name = "password")]
     bmc_password: String,
+
+    //
+    #[arg(long, short, help="Agent listen address:port, eg: oahu10000:8080")]
+    agent: String,
 
     #[arg(
         long,
@@ -165,13 +172,13 @@ struct CLI {
     )]
     stats_dir: String,
 
-    #[arg(
-        long,
-        default_value = "/home_nfs/wainj/local/bin/firestarter",
-        name = "firestarter path",
-        help = "Path to firestarter executable (relative or absolute)"
-    )]
-    firestarter: String,
+    // #[arg(
+    //     long,
+    //     default_value = "/home_nfs/wainj/local/bin/firestarter",
+    //     name = "firestarter path",
+    //     help = "Path to firestarter executable (relative or absolute)"
+    // )]
+    // firestarter: String,
 
     #[arg(
         long,

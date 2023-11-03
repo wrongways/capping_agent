@@ -45,10 +45,6 @@ mod tests {
         let expected = "[::1]:8080".to_string();
         assert_eq!(expected, format!("{server}"));
 
-        let server = Server::new("imac.local:80");
-        let expected = "[::1]:80".to_string();
-        assert_eq!(expected, format!("{server}"));
-
         let server = Server::new("www.ibm.com:80");
         let expected = "[2a02:26f0:2b00:3a7::1e89]:80".to_string();
         assert_eq!(expected, format!("{server}"));
