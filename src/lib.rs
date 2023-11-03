@@ -29,8 +29,9 @@ const SETUP_PAUSE_MILLIS: u64 = 300;
 const AGENT_INFO_ENDPOINT: &str = "/api/system_info";
 const AGENT_RUN_TEST_ENDPOINT: &str = "/api/run_test";
 
-const CAP_STEP_SIZE_WATTS: u64 = 20;
-const CAP_STEP_INTERVAL_SECS: u64 = 4;
+// Move this to the CLI?
+const CAP_STEP_SIZE_WATTS: u64 = 100;
+const CAP_STEP_INTERVAL_SECS: u64 = 3;
 
 lazy_static! {
     /*
