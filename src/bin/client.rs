@@ -52,41 +52,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for test in load_tests {
         info!("{test:?}");
 
-        if test.step == CapStep::Step {
-            total_runtime_secs += step_time;
+        // Only run cap down tests (in the interests of execution time)
+        if test.cap_from > test.cap_to {
+            if test.step == CapStep::Step {
+                total_runtime_secs += step_time;
+            }
+
+            let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
+            let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
+
+            info!("RAPL stats\n{rapl_stats:?}");
+            info!("BMC Stats\n{bmc_stats:?}");
+            info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
+
+            let test_run = TestRun::new(timestamps, test);
+            runs.push(test_run);
+            all_bmc_stats.push(bmc_stats);
+            all_rapl_stats.push(rapl_stats);
         }
-
-        let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
-        let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
-
-        info!("RAPL stats\n{rapl_stats:?}");
-        info!("BMC Stats\n{bmc_stats:?}");
-        info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
-
-        let test_run = TestRun::new(timestamps, test);
-        runs.push(test_run);
-        all_bmc_stats.push(bmc_stats);
-        all_rapl_stats.push(rapl_stats);
     }
 
     for test in thread_tests {
         info!("{test:?}");
 
-        if test.step == CapStep::Step {
-            total_runtime_secs += step_time;
+        // Only run cap down tests (in the interests of execution time)
+        if test.cap_from > test.cap_to {
+            if test.step == CapStep::Step {
+                total_runtime_secs += step_time;
+            }
+
+            let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
+            let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
+
+            info!("RAPL stats\n{rapl_stats:?}");
+            info!("BMC Stats\n{bmc_stats:?}");
+            info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
+
+            let test_run = TestRun::new(timestamps, test);
+            runs.push(test_run);
+            all_bmc_stats.push(bmc_stats);
+            all_rapl_stats.push(rapl_stats);
         }
-
-        let (rapl_stats, bmc_stats, timestamps) = run_test(&test, total_runtime_secs, &client, &bmc).await?;
-        let (start_timestamp, cap_timestamp, end_timestamp) = timestamps;
-
-        info!("RAPL stats\n{rapl_stats:?}");
-        info!("BMC Stats\n{bmc_stats:?}");
-        info!("Start, cap, end timestamps: {start_timestamp}, {cap_timestamp}, {end_timestamp}");
-
-        let test_run = TestRun::new(timestamps, test);
-        runs.push(test_run);
-        all_bmc_stats.push(bmc_stats);
-        all_rapl_stats.push(rapl_stats);
     }
 
     // All done, so OK to pass ownership here

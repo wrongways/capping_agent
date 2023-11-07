@@ -10,7 +10,7 @@ pub struct ThreadTestSuite {
 
 impl ThreadTestSuite {
     pub fn new(online_cores: u64) -> Self {
-        let n_threads: Vec<u64> = ((online_cores - 10)..(online_cores + 1)).collect();
+        let n_threads: Vec<u64> = ((online_cores - 2)..(online_cores + 1)).collect();
         Self {
             iter: iproduct!(
                 all::<CappingOrder>(),

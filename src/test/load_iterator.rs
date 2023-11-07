@@ -6,7 +6,7 @@ use crate::test::{POWER_HIGH, POWER_LOW, CappingOrder, Operation, CapStep, Test}
 
 impl LoadTestSuite {
     pub fn new() -> Self {
-        let loads: Vec<u64> = (90..101).collect();
+        let loads: Vec<u64> = (97..101).collect();
         Self {
             iter: iproduct!(
                 all::<CappingOrder>(),
@@ -14,7 +14,6 @@ impl LoadTestSuite {
                 all::<CapStep>(),
                 vec![POWER_LOW, POWER_HIGH].into_iter().permutations(2),
                 loads,
-                // vec![10_000, 1_000_000]
                 vec![10_000]
             ),
         }

@@ -72,7 +72,7 @@ pub struct TestSuiteInfo {
 
 #[derive(Debug, PartialEq, Sequence, Clone, Serialize, Deserialize)]
 pub enum CapStep {
-    OneShot,
+    // OneShot,
     Step,
 }
 
@@ -80,12 +80,12 @@ pub enum CapStep {
 pub enum CappingOrder {
     LevelBeforeActivate,
     LevelAfterActivate,
-    LevelToLevel,
-    LevelToLevelActivate,
+    // LevelToLevel,
+    // LevelToLevelActivate,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Sequence, Serialize, Deserialize)]
 pub enum Operation {
     Activate,
-    Deactivate,
+    // Deactivate,
 }
