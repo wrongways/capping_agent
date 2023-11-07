@@ -72,7 +72,7 @@ pub struct TestSuiteInfo {
 
 #[derive(Debug, PartialEq, Sequence, Clone, Serialize, Deserialize)]
 pub enum CapStep {
-    // OneShot,
+    OneShot,
     Step,
 }
 

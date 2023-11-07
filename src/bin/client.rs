@@ -173,7 +173,6 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
 
             match config.operation {
                 Operation::Activate => bmc.deactivate_power_cap(),
-                Operation::Deactivate => bmc.activate_power_cap(),
             };
         }
         CappingOrder::LevelAfterActivate => {
@@ -184,15 +183,9 @@ async fn set_initial_conditions(config: &Test, bmc: &BMC) {
 
             match config.operation {
                 Operation::Activate => bmc.activate_power_cap(),
-                Operation::Deactivate => bmc.deactivate_power_cap(),
             }
         }
-        CappingOrder::LevelToLevel | CappingOrder::LevelToLevelActivate => {
-            // set cap level and activate capping
-            bmc.set_cap_power_level(config.cap_from);
-            // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis));
-            bmc.activate_power_cap();
-        }
+
     };
     trace!("initial_conditions set - pause before return");
     // sleep(Duration::from_secs(CONFIGURATION.setup_pause_millis)).await;
@@ -207,10 +200,9 @@ fn do_cap_operation(config: &Test, bmc: &BMC) {
             // just need to perform the operation
             match config.operation {
                 Operation::Activate => bmc.activate_power_cap(),
-                Operation::Deactivate => bmc.deactivate_power_cap(),
             }
         }
-        CappingOrder::LevelAfterActivate | CappingOrder::LevelToLevel => {
+        CappingOrder::LevelAfterActivate => {
             if config.step == CapStep::OneShot {
                 bmc.set_cap_power_level(config.cap_to);
             } else {
@@ -230,10 +222,6 @@ fn do_cap_operation(config: &Test, bmc: &BMC) {
                 // set the final value
                 bmc.set_cap_power_level(config.cap_to);
             }
-        }
-        CappingOrder::LevelToLevelActivate => {
-            bmc.set_cap_power_level(config.cap_to);
-            bmc.activate_power_cap();
         }
     }
 }
